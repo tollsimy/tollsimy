@@ -1,0 +1,70 @@
+name: Generate assets
+
+on:
+  schedule:
+    - cron: "* */12 * * *"  # execute every 12 hours
+
+  workflow_dispatch:
+
+  push:
+    branches:
+    - main
+
+jobs:
+  snake:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: generate snake.svg
+        uses: Platane/snk/svg-only@v3
+        with:
+          github_user_name: ${{ github.repository_owner }}
+          outputs: dist/snake.svg?palette=github-dark
+
+      - name: Upload snake artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: snake-artifact
+          path: dist/
+            
+  vars:
+    permissions:
+      contents: write
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: vars.json
+        run: |
+          mkdir dist
+          years=$(( $(date -d @$(($(date +"%s") - 954547200)) +%Y) - 1970 ))
+          echo "{\"years\": $years}" > dist/vars.json
+
+      - name: Upload years artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: vars-artifact
+          path: dist/
+
+  deploy:
+    needs: [snake, vars]
+    #Run even if not all jobs are executed
+    if: success()
+    runs-on: ubuntu-latest
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: dist
+
+    - name: Deploy to GitHub Pages
+      uses: crazy-max/ghaction-github-pages@v3.1.0
+      with:
+        target_branch: output
+        build_dir: dist
+        keep_history: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
