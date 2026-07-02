@@ -12,7 +12,7 @@ Italian guy.<br>
 Welcome to my GitHub profile!<br>
 <br>
 - 📚 Computer Engineering Master @PoliTO<br>
-- 🧑‍💻 Software Engineer @RedHat<br>
+- 🧑‍💻 Software Engineer @Red Hat<br>
 - 📡 Embedded systems lover<br>
 - 🚀 Open-Source supporter<br>
 - 🐧 Linux addict<br>
